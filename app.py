@@ -9,6 +9,7 @@ class CheckSession(Resource):
     """this allows a user to stay logged in to the site even after refresh
     since the user_id will not be removed from the session until a request is
     made to /logout"""
+
     def get(self):
         user = User.query.filter(User.id == session.get("user_id")).first()
         if not user:
@@ -38,7 +39,9 @@ class Signup(Resource):
         except Exception as e:
             return make_response({'errors': str(e)}, 422)
 
+
 api.add_resource(Signup, '/signup', endpoint='signup')
+
 
 class Login(Resource):
     def post(self):
@@ -46,7 +49,7 @@ class Login(Resource):
         user = User.query.filter(User.username == username).first()
         password = request.get_json()["password"]
         if not user:
-            response_body = {"error":"User not found"}
+            response_body = {"error": "User not found"}
             status = 404
         else:
             if user.authenticate(password):
@@ -58,7 +61,17 @@ class Login(Resource):
                 status = 401
         return make_response(response_body, status)
 
+
 api.add_resource(Login, '/login', endpoint='login')
+
+
+class Logout(Resource):
+    def delete(self):
+        session['user_id'] = None
+        return {}, 204
+
+
+api.add_resource(Logout, '/logout', endpoint='logout')
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -78,4 +91,4 @@ def bmi_calc():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=5555, debug=True)
