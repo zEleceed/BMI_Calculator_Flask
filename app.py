@@ -19,7 +19,46 @@ class CheckSession(Resource):
 
 api.add_resource(CheckSession, '/check_session', endpoint='check_session')
 
-app = Flask(__name__)
+
+class Signup(Resource):
+    def post(self):
+        json = request.get_json()
+        try:
+            user = User(
+                username=json['username'],
+                name=json['name'],
+            )
+            user.password_hash = json['password']
+            db.session.add(User)
+            db.session.commit()
+            # allow user to sign in right after signing up
+            session["user_id"] = user.id
+
+            return make_response(user.to_dict(), 201)
+        except Exception as e:
+            return make_response({'errors': str(e)}, 422)
+
+api.add_resource(Signup, '/signup', endpoint='signup')
+
+class Login(Resource):
+    def post(self):
+        username = request.get_json()['username']
+        user = User.query.filter(User.username == username).first()
+        password = request.get_json()["password"]
+        if not user:
+            response_body = {"error":"User not found"}
+            status = 404
+        else:
+            if user.authenticate(password):
+                session['user_id'] = user.id
+                response_body = user.to_dict()
+                status = 200
+            else:
+                response_body = {'error': 'Invalid username or password'}
+                status = 401
+        return make_response(response_body, status)
+
+api.add_resource(Login, '/login', endpoint='login')
 
 
 @app.route("/", methods=["GET", "POST"])
