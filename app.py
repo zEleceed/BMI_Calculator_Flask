@@ -4,7 +4,6 @@ import MySQLdb.cursors
 import re, os
 from dotenv import load_dotenv
 
-
 app = Flask(__name__)
 
 load_dotenv()
@@ -33,14 +32,15 @@ def hello_world():
 
     return render_template("base.html", result=result)
 
-@app.route("/login", methods =["GET", "POST"])
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
     msg = ""
     if request.method == "POST" and "username" in request.form and "password" in request.form:
         username = request.form["username"]
         password = request.form["password"]
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE username = % s AND password = % s', (username, password, ))
+        cursor.execute('SELECT * FROM accounts WHERE username = % s AND password = % s', (username, password,))
         account = cursor.fetchone()
         if account:
             session["loggedin"] = True
@@ -48,6 +48,14 @@ def login():
             session['username'] = account['username']
             msg = "Logged in succesfully !"
             return render_template('index.html', msg=msg)
+
+
+@app.route('/logout')
+def logout():
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
+    return redirect(url_for("login"))
 
 
 if __name__ == "__main__":
