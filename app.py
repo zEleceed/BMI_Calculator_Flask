@@ -23,14 +23,17 @@ api.add_resource(CheckSession, '/check_session', endpoint='check_session')
 
 class Signup(Resource):
     def post(self):
-        json = request.get_json()
+        if request.is_json:
+            json = request.get_json()
+        else:
+            json = request.form
         try:
             user = User(
                 username=json['username'],
                 name=json['name'],
             )
             user.password_hash = json['password']
-            db.session.add(User)
+            db.session.add(user)
             db.session.commit()
             # allow user to sign in right after signing up
             session["user_id"] = user.id
@@ -89,6 +92,17 @@ def bmi_calc():
 
     return render_template("base.html", result=result)
 
+@app.route("/login", methods=["GET"])
+def login_page():
+    return render_template("login.html")
+
+@app.route("/signup", methods=["GET"])
+def signup_page():
+    return render_template("signup.html")
+
+@app.route("/logout", methods=["GET"])
+def logout_page():
+    return render_template("logout.html")
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)

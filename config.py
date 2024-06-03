@@ -14,12 +14,8 @@ app.json.compact = False
 
 app.secret_key = f"c\xe0\xf8\xd1\x92\xc5/\xa2\xf14\xcdd[\xdb4\x9b"
 
-db = SQLAlchemy()
-migrate = Migrate(app,db)
-db.init_app(app)
-
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
-
+cors = CORS(app)
 api = Api(app)
-
-CORS(app)
