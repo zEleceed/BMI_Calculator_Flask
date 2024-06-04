@@ -37,8 +37,9 @@ class Signup(Resource):
             db.session.commit()
             # allow user to sign in right after signing up
             session["user_id"] = user.id
+            return redirect(url_for('bmi_calc'))
 
-            return make_response(user.to_dict(), 201)
+            # return make_response(user.to_dict(), 201)
         except Exception as e:
             return make_response({'errors': str(e)}, 422)
 
