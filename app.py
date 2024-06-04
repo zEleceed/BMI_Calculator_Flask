@@ -76,7 +76,7 @@ class Login(Resource):
             return make_response(response_body, status)
 
         except Exception as e:
-           return make_response({'errors': str(e)}, 422)
+            return make_response({'errors': str(e)}, 422)
 
 
 api.add_resource(Login, '/login', endpoint='login')
@@ -91,7 +91,12 @@ class Logout(Resource):
 api.add_resource(Logout, '/logout', endpoint='logout')
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
+@app.route("/bmi", methods=["GET", "POST"])
 def bmi_calc():
     if request.method == "POST":
         try:
@@ -104,7 +109,7 @@ def bmi_calc():
     else:
         result = None
 
-    return render_template("base.html", result=result)
+    return render_template("bmi_calc.html", result=result)
 
 
 @app.route("/login", methods=["GET"])
@@ -117,9 +122,9 @@ def signup_page():
     return render_template("signup.html")
 
 
-@app.route("/logout", methods=["GET"])
+@app.route("/logout", methods=["POST"])
 def logout_page():
-    return render_template("logout.html")
+    return redirect(url_for('index'))
 
 
 if __name__ == "__main__":
