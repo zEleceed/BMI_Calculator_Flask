@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, make_response, session
+from flask import Flask, render_template, request, make_response, session, redirect, url_for
 from flask_restful import Resource
 # Local imports
 from config import app, db, api
@@ -48,21 +48,35 @@ api.add_resource(Signup, '/signup', endpoint='signup')
 
 class Login(Resource):
     def post(self):
-        username = request.get_json()['username']
-        user = User.query.filter(User.username == username).first()
-        password = request.get_json()["password"]
-        if not user:
-            response_body = {"error": "User not found"}
-            status = 404
-        else:
-            if user.authenticate(password):
-                session['user_id'] = user.id
-                response_body = user.to_dict()
-                status = 200
+        try:
+            if request.is_json:
+                json = request.get_json()
+                print("Received JSON data:", json)
             else:
-                response_body = {'error': 'Invalid username or password'}
-                status = 401
-        return make_response(response_body, status)
+                json = request.form.to_dict()
+                print("Received JSON data:", json)
+            username = json.get('username')
+            password = json.get("password")
+            print("Username:", username)
+            print("Password:", password)
+            user = User.query.filter(User.username == username).first()
+            print("User:", user)
+            if not user:
+                response_body = {"error": "User not found"}
+                status = 404
+            else:
+                if user.authenticate(password):
+                    session['user_id'] = user.id
+                    return redirect(url_for('bmi_calc'))
+                    # response_body = user.to_dict()
+                    # status = 200
+                else:
+                    response_body = {'error': 'Invalid username or password'}
+                    status = 401
+            return make_response(response_body, status)
+
+        except Exception as e:
+           return make_response({'errors': str(e)}, 422)
 
 
 api.add_resource(Login, '/login', endpoint='login')
@@ -92,17 +106,21 @@ def bmi_calc():
 
     return render_template("base.html", result=result)
 
+
 @app.route("/login", methods=["GET"])
 def login_page():
     return render_template("login.html")
+
 
 @app.route("/signup", methods=["GET"])
 def signup_page():
     return render_template("signup.html")
 
+
 @app.route("/logout", methods=["GET"])
 def logout_page():
     return render_template("logout.html")
+
 
 if __name__ == "__main__":
     app.run(port=5555, debug=True)
