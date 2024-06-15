@@ -1,7 +1,7 @@
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.hybrid import hybrid_property
 
-from config import db, bcrypt
+from .config import db, bcrypt
 
 
 class User(db.Model, SerializerMixin):
@@ -15,7 +15,6 @@ class User(db.Model, SerializerMixin):
     @hybrid_property
     # this will prevent our password_hash from being returned in a request
     # to users
-
     def password_hash(self):
         raise Exception("Password hashes may not be viewed.")
 

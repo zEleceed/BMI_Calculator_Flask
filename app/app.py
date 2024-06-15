@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, make_response, session, redirect, url_for
 from flask_restful import Resource
 # Local imports
-from config import app, db, api
-from models import *
+from .config import app, db, api
+from .models import *
 
 
 class CheckSession(Resource):
