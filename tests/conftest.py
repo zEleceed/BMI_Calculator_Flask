@@ -28,5 +28,13 @@ def init_database(app):
 
     default_user = User(username='testuser1', name='Test User1')
     default_user.password_hash = "FlaskIsHashed!"
-    yield db
+
+    second_user = User(username="secondtest", name="secondbottester")
+    second_user.password_hash = "BotIsNiceForFlask!"
+
+    db.session.add(default_user)
+    db.session.add(second_user)
+
+    db.session.commit() # Commit the changes for the users
+    yield # Testing Magic Happens
     db.drop_all()
