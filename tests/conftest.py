@@ -15,6 +15,13 @@ def client(app):
 
 
 @pytest.fixture(scope='module')
+def new_user():
+    user = User(username='testuser', name='Test User')
+    user.password_hash = "TestingIsGreat"
+    return user
+
+
+@pytest.fixture(scope='module')
 def init_database(app):
     db.create_all()
     yield db
