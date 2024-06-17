@@ -23,6 +23,10 @@ def new_user():
 
 @pytest.fixture(scope='module')
 def init_database(app):
+    # Create the database and the database table
     db.create_all()
+
+    default_user = User(username='testuser1', name='Test User1')
+    default_user.password_hash = "FlaskIsHashed!"
     yield db
     db.drop_all()
