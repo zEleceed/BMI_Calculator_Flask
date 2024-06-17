@@ -31,3 +31,14 @@ def test_user_authenticated(new_user):
     new_user.password_hash = "TestingIsAwesomeeeee"
     assert new_user.authenticate("TestingIsAwesomeeeee")
     assert not new_user.authenticate("Fake")
+
+
+def test_serialization_rules(new_user):
+    """
+        GIVEN an existing user
+        WHEN a user is serialized into dict type
+        THEN check if the password hash is included in the output
+    """
+    new_user.password_hash = "TestSerialize"
+    user_dict = new_user.to_dict()
+    assert "_password_hash" not in user_dict
