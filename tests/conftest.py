@@ -23,18 +23,20 @@ def new_user():
 
 @pytest.fixture(scope='module')
 def init_database(app):
-    # Create the database and the database table
-    db.create_all()
+    with app.app_context():
+        # Create the database and the database table
+        db.create_all()
 
-    default_user = User(username='testuser1', name='Test User1')
-    default_user.password_hash = "FlaskIsHashed!"
+        default_user = User(username='testuser1', name='Test User1')
+        default_user.password_hash = "FlaskIsHashed!"
 
-    second_user = User(username="secondtest", name="secondbottester")
-    second_user.password_hash = "BotIsNiceForFlask!"
+        second_user = User(username="secondtest", name="secondbottester")
+        second_user.password_hash = "BotIsNiceForFlask!"
 
-    db.session.add(default_user)
-    db.session.add(second_user)
+        db.session.add(default_user)
+        db.session.add(second_user)
 
-    db.session.commit() # Commit the changes for the users
-    yield # Testing Magic Happens
-    db.drop_all()
+        db.session.commit()  # Commit the changes for the users
+        yield  # Testing Magic Happens
+        db.drop_all()
+
