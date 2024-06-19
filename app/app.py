@@ -28,6 +28,10 @@ class Signup(Resource):
         else:
             json = request.form
         try:
+            # Check if the username already exists
+            if User.query.filter_by(username=json['username']).first():
+                return make_response({'errors': 'Username already exists'}, 409)
+
             user = User(
                 username=json['username'],
                 name=json['name'],
