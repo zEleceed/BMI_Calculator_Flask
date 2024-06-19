@@ -47,6 +47,23 @@ def test_login_attempt(client, init_database):
     response = client.post("/login",
                            data=dict(username="123123", password="123123123123"),
                            follow_redirects=True)
-    assert response.code == 400
+    assert response.status_code == 404
+    assert b'{\n  "error": "User not found"\n}\n' in response.data
+
+
+def test_duplicate_registration(client, init_database):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/register' page is posted to (POST) using a username already registered
+    THEN check an error message is returned to the user
+    """
+    response = client.post("/signup",
+                           data=dict(username='testuser1', name='Test User1', password="helloworld!"),
+                           follow_redirects=True)
+
+    assert response.status_code == 409
+    assert b'"errors": "Username already exists"' in response.data
+
+
 
 
